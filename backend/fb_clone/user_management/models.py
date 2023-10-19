@@ -20,6 +20,7 @@ class UserManager(BaseUserManager):
             full_name=full_name,
         )
         user.is_admin = True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 
@@ -36,6 +37,7 @@ class User(AbstractBaseUser):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     # Add fields for relationships (friends, posts, comments, etc.) here.
 
@@ -48,3 +50,9 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+    def has_perm(self,perm,obj=None):
+        return self.is_admin
+
+    def has_module_perms(self,app):
+        return True # Always true
