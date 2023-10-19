@@ -106,7 +106,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5000",
+    "http://localhost:3000",
 ]
 
 PASSWORD_RESET_TIMEOUT = 300 # Time taken in seconds for tokens from PasswordResetTokenGenerator to generate
