@@ -1,20 +1,25 @@
-import NavigationBar from "./components/Post/NavigationBar";
-import NewsFeed from "./components/Post/NewsFeed";
-import { Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import PrivateRoute from "./utils/PrivateRoute";
+import Profile from "./pages/Profile";
 
 function App() {
-  const isAuthenticated = localStorage.getItem("token");
   return (
-    <div className="App">
-      {isAuthenticated ? (
-        <>
-          <NavigationBar />
-          <NewsFeed />
-        </>
-      ) : (
-        <Navigate to="/login" replace />
-      )}
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route
+            path="/profile"
+            element={<PrivateRoute Component={Profile} />}
+          />
+          <Route exact path="/" element={<PrivateRoute Component={Home} />} />
+
+          <Route element={<Login />} path="/login" />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

@@ -1,27 +1,26 @@
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import AuthContext from "../../context/AuthContext";
 import "../../style/NavigationBar.css";
-import { useNavigate } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-
 function NavigationBar() {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    // Perform logout actions (e.g., clear the token from local storage)
-    localStorage.removeItem("token");
-
-    // Redirect to the login page or any other page
-    navigate("/login"); // Change "/login" to the appropriate URL
-  };
+  let { user, logoutUser } = useContext(AuthContext);
+  console.log("user", user);
   return (
     <div className="navbar">
-      <a className="logo" href="#">
+      <Link className="logo" to="/">
         Anique's Facebook Clone
-      </a>
-      <a href="#">My Feed</a>
-      <a href="#">Inbox</a>
-      <a href="#">Notification</a>
-      <a href="#">Search</a>
-      <a href="#">Settings</a>
-      <a onClick={handleLogout}>Logout</a>
+      </Link>
+      <Link to="/">My Feed</Link>
+      <Link to="/">Inbox</Link>
+      <Link to="/">Notification</Link>
+      <Link to="/">Settings</Link>
+
+      {user && <Link to="/profile">Hi , {user.full_name}</Link>}
+      {user ? (
+        <p onClick={logoutUser}>Logout</p>
+      ) : (
+        <Link to="/login">Login</Link>
+      )}
     </div>
   );
 }

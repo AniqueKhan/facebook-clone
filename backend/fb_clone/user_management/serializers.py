@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import Token
 from user_management.models import User
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
@@ -24,7 +26,11 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email','password']
 
+    
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email','full_name','bio']
+
+

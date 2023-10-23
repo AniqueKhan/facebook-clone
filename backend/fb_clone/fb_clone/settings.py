@@ -4,12 +4,14 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Secret Key - Must not be exposed - Reading it from the env file
 SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Installed Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,6 +22,7 @@ INSTALLED_APPS = [
     "user_management",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders"
 ]
 
@@ -96,6 +99,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user_management.User'
 
+# Django Rest Framework Settings For Api Building
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -105,13 +109,18 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Allowing React To Send Requests To Our Backend Server
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-PASSWORD_RESET_TIMEOUT = 300 # Time taken in seconds for tokens from PasswordResetTokenGenerator to generate
+# Time taken in seconds for tokens from PasswordResetTokenGenerator to generate
+PASSWORD_RESET_TIMEOUT = 300 
 
+# JSON Web Tokens Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS":True,
+    "BLACKLIST_AFTER_ROTATION":True,
 }
