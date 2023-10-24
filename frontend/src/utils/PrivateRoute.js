@@ -4,12 +4,13 @@ import AuthContext from "../context/AuthContext";
 
 const PrivateRoute = ({ Component }) => {
   let { user } = useContext(AuthContext);
+  console.log(user);
   const navigate = useNavigate();
   useEffect(() => {
     if (!user) {
       navigate("/login");
     }
-  }, [user]);
+  });
   return <Component />;
 };
 export default PrivateRoute;

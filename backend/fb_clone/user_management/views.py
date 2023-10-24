@@ -14,6 +14,7 @@ from django.contrib.auth import authenticate
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     refresh['full_name'] = user.full_name
+    if user.profile_picture:refresh['profile_picture']=user.profile_picture.url
     return {
         "refresh":str(refresh),
         "access":str(refresh.access_token)

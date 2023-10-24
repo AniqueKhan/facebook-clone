@@ -28,10 +28,11 @@ class User(AbstractBaseUser):
     email=models.EmailField(verbose_name="Email",max_length=255,unique=True)
     full_name = models.CharField(max_length=255)
     date_of_birth = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("FemaleF", "Female"), ("Other", "Other")])
+    gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("FemaleF", "Female"), ("Other", "Other")],blank=True,null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     cover_photo = models.ImageField(upload_to='cover_photos/', null=True, blank=True)
     bio = models.TextField(blank=True)
+    location = models.CharField(max_length=100,blank=True,null=True)
     
     # Define any other fields you need here.
 

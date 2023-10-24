@@ -13,6 +13,7 @@ export default AuthContext;
 export const AuthProvider = ({ children }) => {
   // Initializing variables
   let initialLocalStorageTokens = localStorage.getItem("authTokens");
+  console.log(initialLocalStorageTokens);
 
   // State Management
   let [authTokens, setAuthTokens] = useState(() =>
@@ -89,15 +90,15 @@ export const AuthProvider = ({ children }) => {
         setUser(jwt_decode(data.access));
         localStorage.setItem("authTokens", JSON.stringify(data));
       } else {
+        console.log("Error updating token");
         logoutUser();
-      }
-
-      if (loading) {
-        setLoading(false);
       }
     } catch (error) {
       // Handle errors, e.g., network errors, request validation, etc.
       console.error("Error updating token:", error);
+    }
+    if (loading) {
+      setLoading(false);
     }
   };
 
@@ -122,6 +123,7 @@ export const AuthProvider = ({ children }) => {
     loginUser: loginUser,
     logoutUser: logoutUser,
   };
+  console.log(loading);
   return (
     <AuthContext.Provider value={contextData}>
       {loading ? null : children}

@@ -10,11 +10,11 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<PrivateRoute Component={Home} />} />
           <Route
             path="/profile"
             element={<PrivateRoute Component={Profile} />}
           />
-          <Route exact path="/" element={<PrivateRoute Component={Home} />} />
 
           <Route element={<Login />} path="/login" />
         </Routes>

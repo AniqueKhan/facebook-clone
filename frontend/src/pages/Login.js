@@ -4,6 +4,7 @@ import AuthContext from "../context/AuthContext";
 
 function Login() {
   let { loginUser } = useContext(AuthContext);
+  console.log("Login Page Reached");
   return (
     <div>
       <NavigationBar />

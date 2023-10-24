@@ -1,9 +1,11 @@
 import React from "react";
 import NavigationBar from "../components/Post/NavigationBar";
+import Navbar from "../components/Post/Navbar";
 function Home() {
   return (
     <div>
-      <NavigationBar /> This is the home page
+      <NavigationBar />
+      <Navbar /> This is the home page
     </div>
   );
 }
