@@ -33,6 +33,7 @@ class User(AbstractBaseUser):
     cover_photo = models.ImageField(upload_to='cover_photos/', null=True, blank=True)
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=100,blank=True,null=True)
+    friends = models.ManyToManyField("self",related_name="user_friends",blank=True)
     
     # Define any other fields you need here.
 
@@ -57,3 +58,15 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self,app):
         return True # Always true
+
+
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="from_user")
+    to_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="to_user")
+    created_at = models.DateTimeField(auto_now_add=True)
+    accepted_at = models.DateTimeField(blank=True,null=True)
+    status = models.CharField(max_length=255,choices=[("A","Accepted"),("R","Rejected"),("P","Pending")])
+
+
+    def __str__(self):
+        return f"Friend Request from {self.from_user} to {self.to_user}"

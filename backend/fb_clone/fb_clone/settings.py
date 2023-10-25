@@ -123,7 +123,7 @@ PASSWORD_RESET_TIMEOUT = 300
 
 # JSON Web Tokens Settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2000), # For testing 
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS":True,
     "BLACKLIST_AFTER_ROTATION":True,

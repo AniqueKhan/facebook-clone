@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import Token
-from user_management.models import User
+from user_management.models import User,FriendRequest
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +33,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['email','full_name','bio']
 
 
+class FriendRequestSerializer(serializers.ModelSerializer):
+    from_user = ProfileSerializer(many=False)
+    to_user = ProfileSerializer(many=False)
+    class Meta:
+        model = FriendRequest
+        fields = ["from_user","to_user","status"]

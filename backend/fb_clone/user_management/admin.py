@@ -1,8 +1,9 @@
 from django.contrib import admin
-from user_management.models import User
+from user_management.models import User,FriendRequest
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
+from user_management.forms import CustomUserAdminForm
 class UserAdmin(BaseUserAdmin):
+    form = CustomUserAdminForm
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
@@ -10,7 +11,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ["is_admin"]
     fieldsets = [
         ("User Credentials", {"fields": ["email", "password"]}),
-        ("Personal info", {"fields": ["full_name","bio","gender","location","profile_picture","cover_photo"]}),
+        ("Personal info", {"fields": ["full_name","bio","friends","gender","location","profile_picture","cover_photo"]}),
         ("Permissions", {"fields": ["is_admin"]}),
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -31,3 +32,4 @@ class UserAdmin(BaseUserAdmin):
 
 # Now register the new UserAdmin...
 admin.site.register(User, UserAdmin)
+admin.site.register(FriendRequest)
