@@ -11,6 +11,7 @@ from user_management.serializers import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from datetime import datetime
 
 # Create Tokens Manually For Users
 # From the original documentation from Simple JWT
@@ -53,7 +54,7 @@ class ProfileView(APIView):
         
 class FriendRequestView(ModelViewSet):
     queryset = FriendRequest.objects.all()
-    http_method_names = ['get','post']
+    http_method_names = ['get','post','patch']
     permission_classes = [IsAuthenticated]
 
     def list(self,request):
@@ -88,7 +89,7 @@ class FriendRequestView(ModelViewSet):
 
         # Can not send requests to yourself
         if to_user == from_user:
-            return Response({"message":"You can not send friend requests to yourself"},status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"You can not send friend request to yourself"},status.HTTP_400_BAD_REQUEST)
         
         # The recipient email must be valid
         if not to_user:
@@ -103,5 +104,35 @@ class FriendRequestView(ModelViewSet):
             return Response({"message":"A friend request to this user is already pending"},status.HTTP_400_BAD_REQUEST)
 
         friend_request = FriendRequest.objects.create(from_user=from_user,to_user=to_user,status="P")
+        serializer = FriendRequestSerializer(friend_request,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+
+
+    @action(detail=True,methods=['patch'])
+    def accept_request(self,request,pk):
+        # Getting the current logged in user
+        current_user = request.user
+
+        # Getting the friend request using the primary key
+        friend_request = FriendRequest.objects.filter(pk=pk).first()
+
+        # The friend request should exist
+        if not friend_request:
+            return Response({"message":"There is no friend request with this id"},status.HTTP_400_BAD_REQUEST)
+        
+        if current_user in friend_request.from_user.friends.all():
+            return Response({"message":"You are already friends with this user"},status.HTTP_400_BAD_REQUEST)
+
+        if friend_request.status != "P":
+            return Response({"message":"The status of this friend request is not pending. You can only accept pending friend requests"},status.HTTP_400_BAD_REQUEST)
+
+        if friend_request.to_user != current_user:
+            return Response({"message":"This friend request was not meant for you."},status.HTTP_400_BAD_REQUEST)
+
+        friend_request.status = "A"
+        friend_request.accepted_at = datetime.now()
+        current_user.friends.add(friend_request.from_user)
+        current_user.save()
+        friend_request.save()
         serializer = FriendRequestSerializer(friend_request,many=False)
         return Response(serializer.data,status.HTTP_200_OK)
