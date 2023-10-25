@@ -58,11 +58,11 @@ class FriendRequestView(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self,request):
-        return Response({"message": "Get all method disabled"},
+        return Response({"error_message": "Get all method disabled"},
                         status=status.HTTP_400_BAD_REQUEST)
     
     def retrieve(self,request,pk=None):
-        return Response({"message": "Get single method disabled"},
+        return Response({"error_message": "Get single method disabled"},
                         status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False,methods=['GET'])
@@ -80,7 +80,7 @@ class FriendRequestView(ModelViewSet):
     @action(detail=False, methods=["POST"])
     def send_request(self,request):
         if not request.data.get("to_user"):
-            return Response({"message": "You need to provide a to_user"},
+            return Response({"error_message": "You need to provide a to_user"},
                         status=status.HTTP_400_BAD_REQUEST)
         
         from_user = request.user
@@ -89,19 +89,19 @@ class FriendRequestView(ModelViewSet):
 
         # Can not send requests to yourself
         if to_user == from_user:
-            return Response({"message":"You can not send friend request to yourself"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"You can not send friend request to yourself"},status.HTTP_400_BAD_REQUEST)
         
         # The recipient email must be valid
         if not to_user:
-            return Response({"message":"No user exists with this email"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"No user exists with this email"},status.HTTP_400_BAD_REQUEST)
 
         # The recipient must not already be a friend of the user
         if to_user in from_user.friends.all():
-            return Response({"message":"This user is already your friend"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"This user is already your friend"},status.HTTP_400_BAD_REQUEST)
 
         # There should not be an already existing pending request
         if self.queryset.filter(from_user=from_user,to_user=to_user,status="P").exists():
-            return Response({"message":"A friend request to this user is already pending"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"A friend request to this user is already pending"},status.HTTP_400_BAD_REQUEST)
 
         friend_request = FriendRequest.objects.create(from_user=from_user,to_user=to_user,status="P")
         serializer = FriendRequestSerializer(friend_request,many=False)
@@ -118,16 +118,16 @@ class FriendRequestView(ModelViewSet):
 
         # The friend request should exist
         if not friend_request:
-            return Response({"message":"There is no friend request with this id"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"There is no friend request with this id"},status.HTTP_400_BAD_REQUEST)
         
         if current_user in friend_request.from_user.friends.all():
-            return Response({"message":"You are already friends with this user"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"You are already friends with this user"},status.HTTP_400_BAD_REQUEST)
 
         if friend_request.status != "P":
-            return Response({"message":"The status of this friend request is not pending. You can only accept pending friend requests"},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"The status of this friend request is not pending. You can only accept pending friend requests"},status.HTTP_400_BAD_REQUEST)
 
         if friend_request.to_user != current_user:
-            return Response({"message":"This friend request was not meant for you."},status.HTTP_400_BAD_REQUEST)
+            return Response({"error_message":"This friend request was not meant for you."},status.HTTP_400_BAD_REQUEST)
 
         friend_request.status = "A"
         friend_request.accepted_at = datetime.now()

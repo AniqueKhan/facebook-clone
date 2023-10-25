@@ -65,7 +65,7 @@ class FriendRequest(models.Model):
     to_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="to_user")
     created_at = models.DateTimeField(auto_now_add=True)
     accepted_at = models.DateTimeField(blank=True,null=True)
-    status = models.CharField(max_length=255,choices=[("A","Accepted"),("R","Rejected"),("P","Pending")])
+    status = models.CharField(max_length=255,choices=[("A","Accepted"),("R","Rejected"),("P","Pending")], default='P')
 
 
     def __str__(self):
