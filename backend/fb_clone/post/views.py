@@ -4,12 +4,12 @@ from post.serializers import PostSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from user_management.models import User
-from post.models import Post
+from post.models import Post,Comment
 from rest_framework.decorators import action
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
     permission_classes = [IsAuthenticated]
-    http_method_names=['get','delete']
+    http_method_names=['get','delete','patch','post']
     serializer_class = PostSerializer
 
     def list(self,request):
@@ -54,6 +54,40 @@ class PostView(ModelViewSet):
         posts = self.queryset.filter(user=user,privacy__in=['public', 'friends'])
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
+
+    @action(detail=True,methods=['patch'])
+    def like_post(self,request,pk):
+        current_user = request.user
+        post = self.queryset.filter(pk=pk).first()
+        if not post:
+            return Response({"error_message":"No post exist with this ID."},status.HTTP_400_BAD_REQUEST)
+
+        if current_user not in post.likes.all():
+            post.likes.add(current_user)
+        else: 
+            post.likes.remove(current_user)
+
+        serializer = self.serializer_class(post,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+    
+    @action(detail=True,methods=['post'])
+    def add_comment(self,request,pk):
+        current_user = request.user
+        post = self.queryset.filter(pk=pk).first()
+        content = request.data.get("content")
+
+        if not content:
+            return Response({"error_message":"You need to provide content for your comment."},status.HTTP_400_BAD_REQUEST)
+        if not post:
+            return Response({"error_message":"No post exist with this ID."},status.HTTP_400_BAD_REQUEST)
+        comment = Comment.objects.create(user=current_user,post=post,content=content)
+        comment.save()
+
+        serializer = self.serializer_class(post,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+    
+
+
 
          
     
