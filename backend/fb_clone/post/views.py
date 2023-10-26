@@ -6,6 +6,7 @@ from rest_framework import status
 from user_management.models import User
 from post.models import Post,Comment
 from rest_framework.decorators import action
+
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
     permission_classes = [IsAuthenticated]
@@ -86,7 +87,15 @@ class PostView(ModelViewSet):
         serializer = self.serializer_class(post,many=False)
         return Response(serializer.data,status.HTTP_200_OK)
     
-
+    @action(detail=True,methods=['delete'])
+    def delete_comment(self,request,pk):
+        comment = Comment.objects.filter(pk=pk).first()
+        if not comment:
+            return Response({"error_message":"No comment exist with this ID."},status.HTTP_400_BAD_REQUEST)
+        if request.user != comment.user and comment.post.user!=request.user:
+            return Response({"error_message":"You do not have permissions to delete this comment"},status.HTTP_401_UNAUTHORIZED)
+        comment.delete()
+        return Response({"message":"Comment Deleted Succesfully"},status.HTTP_200_OK)
 
 
          
