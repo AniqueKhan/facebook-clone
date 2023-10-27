@@ -1,11 +1,12 @@
 import React from "react";
 import NavigationBar from "../components/Post/NavigationBar";
-import Navbar from "../components/Post/Navbar";
+import NewsFeed from "../components/Post/NewsFeed";
 function Home() {
   return (
     <div>
       <NavigationBar />
-      <Navbar /> This is the home page
+      <NewsFeed />
+      This is the home page
     </div>
   );
 }

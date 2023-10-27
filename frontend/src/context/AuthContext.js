@@ -45,9 +45,11 @@ export const AuthProvider = ({ children }) => {
       );
 
       if (response.status === 200) {
-        let token = response.data["token"];
+        let token = response.data["data"]["token"];
         // Successful login
         console.log("Login Successful");
+        console.log(token);
+        console.log(response.data);
         setAuthTokens(token);
         setUser(jwt_decode(token["access"]));
         localStorage.setItem("authTokens", JSON.stringify(token));
@@ -87,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       if (response.status === 200) {
         const data = response.data;
         setAuthTokens(data);
-        setUser(jwt_decode(data.access));
+        setUser(jwt_decode(data["access"]));
         localStorage.setItem("authTokens", JSON.stringify(data));
       } else {
         console.log("Error updating token");
