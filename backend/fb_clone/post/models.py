@@ -25,6 +25,9 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Post by {self.user.full_name}'
+    
+    def is_image(self):
+        return self.media_file.name.split('.')[-1] in ['jpg','jpeg','png']
 
 
 class Comment(models.Model):

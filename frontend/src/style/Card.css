@@ -45,14 +45,58 @@
   font-size: 14px;
 }
 
+.post-content {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  margin-top: 10px;
+}
+
+/* For images inside .post-content */
 .post-content img {
   max-width: 100%;
+  max-height: 100%; /* Ensure the image doesn't overflow */
   border-radius: 10px;
-  margin-top: 10px;
+}
+
+/* For videos inside .post-content */
+.post-content video {
+  max-width: 100%;
+  max-height: 100%; /* Ensure the video doesn't overflow */
+  border-radius: 10px;
 }
 
 .post-footer .caption {
   color: white;
   font-size: 18px;
   margin-top: 10px;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: center; /* Center the button container horizontally */
+  align-items: center;
+  margin-top: 10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Distribute buttons equally */
+  width: 100%; /* Make the button container take the full width */
+}
+
+.post-button {
+  flex: 1; /* Each button takes an equal portion of the available space */
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Optional: Add some margin between the buttons */
+.post-button + .post-button {
+  margin-left: 10px;
 }
