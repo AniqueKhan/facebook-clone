@@ -10,7 +10,7 @@ from datetime import datetime
 
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,]
     http_method_names=['get','delete','patch','post']
     serializer_class = PostSerializer
 
@@ -95,7 +95,7 @@ class PostView(ModelViewSet):
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
 
-    @action(detail=True,methods=['patch'])
+    @action(detail=True,methods=['get'])
     def like_post(self,request,pk):
         current_user = request.user
         post = self.queryset.filter(pk=pk).first()

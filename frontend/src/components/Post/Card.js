@@ -4,33 +4,61 @@ import { BASE_URL, API_BASE_POSTS_URL } from "../../utils/ApiEndpoints";
 import axios from "axios";
 import AuthContext from "../../context/AuthContext";
 function Card({ post }) {
-  let [liked, setLiked] = useState(false);
   const { authTokens, user } = useContext(AuthContext);
+  // Initializing like state variable
+  let [liked, setLiked] = useState(false);
+  let [likesCount, setLikeCount] = useState(0);
+
+  // Setting configuration for sending authenticated requests
   const config = {
     headers: {
       Authorization: `Bearer ${authTokens.access}`,
     },
   };
-  const toggleLike = () => {
-    axios
-      .patch(`${API_BASE_POSTS_URL}/${post.id}/like_post`, config)
-      .then((response) => {
-        // Update the UI based on the API response
-        if (response.status === 200) {
-          setLiked(!liked);
-        }
-      })
-      .catch((error) => {
-        console.error("Error while liking the post:", error);
-      });
-  };
-  // Use useEffect to check the like status when the component mounts
-  // useEffect(() => {
-  //   if (post.likes && post.likes[0]) {
-  //     console.log(post.likes[0]["id"]);
-  //   }
-  // }, [post.likes, user.id]);
 
+  // Toggle Like Function
+  const toggleLike = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_POSTS_URL}/${post.id}/like_post`,
+        config
+      );
+
+      if (response.status === 200) {
+        // Fetch the updated post data from the server
+        const updatedPostResponse = await axios.get(
+          `${API_BASE_POSTS_URL}/${post.id}`,
+          config
+        );
+
+        if (updatedPostResponse.status === 200) {
+          const updatedPost = updatedPostResponse.data["data"];
+          if (user && user.user_id && updatedPost.likes) {
+            setLiked(
+              updatedPost.likes.some((like) => like.id === user.user_id)
+            );
+            setLikeCount(updatedPost.likes.length);
+          }
+        } else {
+          console.log("Error while getting updated post data response");
+        }
+      } else {
+        console.log("Error while liking/unliking the post");
+      }
+    } catch (error) {
+      console.error("Error while liking/unliking the post:", error);
+    }
+  };
+
+  // Use Effect
+  useEffect(() => {
+    // Checking if the user has already liked the post
+    if (user && user.user_id && post.likes) {
+      const hasLiked = post.likes.some((like) => like.id === user.user_id);
+      setLiked(hasLiked);
+      setLikeCount(post.likes.length);
+    }
+  }, [post.likes, user.user_id]);
   return (
     <div className="middle-portion">
       <div className="post-card">
@@ -61,6 +89,7 @@ function Card({ post }) {
           <p className="caption">{post.content}</p>
         </div>
         <div className="button-container">
+          <p>Likes Count : {likesCount}</p>
           <button className="post-button" onClick={toggleLike}>
             {liked ? "Liked" : "Like"}
           </button>

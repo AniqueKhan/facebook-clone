@@ -5,13 +5,20 @@ import { API_BASE_POSTS_URL } from "../../utils/ApiEndpoints";
 import axios from "axios";
 
 function NewsFeed() {
+  // Getting Authentication Stuff Using Contenxt
   const { authTokens, logoutUser } = useContext(AuthContext);
+
+  // Initializing empty post state array
   let [posts, setPosts] = useState([]);
+
+  // Setting configuration for sending authenticated requests
   const config = {
     headers: {
       Authorization: `Bearer ${authTokens.access}`,
     },
   };
+
+  // Getting posts
   let getPosts = async () => {
     try {
       const response = await axios.get(API_BASE_POSTS_URL, config);
@@ -34,6 +41,7 @@ function NewsFeed() {
       logoutUser();
     }
   };
+
   useEffect(() => {
     getPosts();
   }, []);
@@ -43,9 +51,6 @@ function NewsFeed() {
         <Card key={post.id} post={post} />
       ))}
     </div>
-    // <div>
-    //   <Card />
-    // </div>
   );
 }
 
