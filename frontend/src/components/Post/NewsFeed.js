@@ -3,6 +3,7 @@ import AuthContext from "../../context/AuthContext";
 import Card from "./Card";
 import { API_BASE_POSTS_URL } from "../../utils/ApiEndpoints";
 import axios from "axios";
+import { gatherConfiguration } from "../../utils/HelperFunctions";
 
 function NewsFeed() {
   // Getting Authentication Stuff Using Contenxt
@@ -11,17 +12,13 @@ function NewsFeed() {
   // Initializing empty post state array
   let [posts, setPosts] = useState([]);
 
-  // Setting configuration for sending authenticated requests
-  const config = {
-    headers: {
-      Authorization: `Bearer ${authTokens.access}`,
-    },
-  };
-
   // Getting posts
   let getPosts = async () => {
     try {
-      const response = await axios.get(API_BASE_POSTS_URL, config);
+      const response = await axios.get(
+        API_BASE_POSTS_URL,
+        gatherConfiguration(authTokens)
+      );
 
       if (response.status === 200) {
         // Successful login
@@ -30,13 +27,11 @@ function NewsFeed() {
         setPosts(response.data["data"]);
         console.log("posts", posts);
       } else {
-        alert("Something went wrong.");
         console.error("Post Info Gathering Failed");
         logoutUser();
       }
     } catch (error) {
       // Handle any errors that occurred during the request
-      alert("Something went wrong.");
       console.error("An error occurred:", error);
       logoutUser();
     }

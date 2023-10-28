@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
+import { capitalizeFirstWord } from "../../utils/HelperFunctions";
 import "../../style/NavigationBar.css";
 function NavigationBar() {
   let { user, logoutUser } = useContext(AuthContext);
@@ -15,7 +16,9 @@ function NavigationBar() {
       <Link to="/">Notification</Link>
       <Link to="/">Settings</Link>
 
-      {user && <Link to="/profile">Hi , {user.full_name}</Link>}
+      {user && (
+        <Link to="/profile">Hi , {capitalizeFirstWord(user.full_name)}</Link>
+      )}
       {user ? (
         <p onClick={logoutUser}>Logout</p>
       ) : (

@@ -124,7 +124,7 @@ class PostView(ModelViewSet):
         comment.save()
 
         serializer = self.serializer_class(post,many=False)
-        return Response(serializer.data,status.HTTP_200_OK)
+        return Response(serializer.data,status.HTTP_201_CREATED)
     
     @action(detail=True,methods=['delete'])
     def delete_comment(self,request,pk):
