@@ -23,8 +23,11 @@ class Post(models.Model):
     edited = models.BooleanField(default=False)
     edited_at = models.DateTimeField(blank=True,null=True)
 
+    def truncate_content(self):
+        return self.content if len(self.content) < 40 else self.content[:40]
+    
     def __str__(self):
-        return f'Post by {self.user.full_name}'
+        return self.truncate_content()
     
     def is_image(self):
         return self.media_file.name.split('.')[-1] in ['jpg','jpeg','png']
@@ -41,6 +44,7 @@ class Comment(models.Model):
 
     def truncate_content(self):
         return self.content if len(self.content) < 40 else self.content[:40]
+    
     
     def __str__(self):
         return self.truncate_content()
@@ -59,4 +63,16 @@ class SharedPost(models.Model):
         ('friends', 'Friends'),
         ('private', 'Private')
     ], default='friends')
+
+    def truncate_content(self):
+        return self.content if len(self.content) < 40 else self.content[:40]
+    
+    def __str__(self):
+        return self.truncate_content()
+
+    def save(self, *args, **kwargs):
+       if self.post.privacy == "private" and self.user!=self.post.user:
+           raise ValidationError("You can not share a private post.")
+       
+       super(SharedPost, self).save(*args, **kwargs) # Call the real save() method
 
