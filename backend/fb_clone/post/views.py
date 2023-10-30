@@ -18,7 +18,7 @@ class PostView(ModelViewSet):
         # Feed posts
         current_user = request.user
         feed_users = User.objects.filter(pk=current_user.pk) | current_user.friends.all()
-        posts = Post.objects.filter(user__in=feed_users,privacy__in=['public', 'friends'])
+        posts = Post.objects.filter(user__in=feed_users)
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
     
@@ -91,7 +91,7 @@ class PostView(ModelViewSet):
         if user == request.user:
             return Response({"error_message":"You can not get your own posts through this endpoint."},status.HTTP_401_UNAUTHORIZED)
 
-        posts = self.queryset.filter(user=user,privacy__in=['public', 'friends'])
+        posts = self.queryset.filter(user=user)
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
 

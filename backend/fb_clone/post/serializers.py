@@ -32,7 +32,7 @@ class PostSerializer(serializers.ModelSerializer):
             "media_file",
             "humanized_created_at",
             "is_image",
-            "privacy"
+            "privacy",
         ]
 
     def get_comments(self, obj):

@@ -27,11 +27,10 @@ class LoginSerializer(serializers.ModelSerializer):
 
     
 
-class ProfileSerializer(serializers.ModelSerializer):
-    
+class ProfileSerializer(serializers.ModelSerializer):    
     class Meta:
         model = User
-        fields = ['id','email','full_name','bio','profile_picture']
+        fields = ['id','email','full_name','bio','profile_picture',"friends"]
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):

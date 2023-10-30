@@ -80,6 +80,7 @@ function Card({ post }) {
         setComments(updatedPost.comments); // Add the new comment to the existing comments
         setComment(""); // Clear the comment input field
         setCommentsCount(updatedPost.comments.length);
+        showCommentBox(false);
       } else {
         console.log("Error while fetching updated post after comment");
       }
@@ -103,9 +104,11 @@ function Card({ post }) {
     }
 
     // Set the initial share button visibility
-    console.log("privacy", post.user, user.user_id);
-    if (post.privacy == "public" || userIsFriend(user, post)) {
-      setShareButtonVisibility(true);
+    console.log("privacy", post.privacy);
+    if (post.privacy !== "private") {
+      if (post.privacy == "public" || userIsFriend(user, post)) {
+        setShareButtonVisibility(true);
+      }
     }
   }, [post.likes, user.user_id]);
 
