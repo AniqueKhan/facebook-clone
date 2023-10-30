@@ -6,7 +6,6 @@ function Home() {
     <div>
       <NavigationBar />
       <NewsFeed />
-      This is the home page
     </div>
   );
 }

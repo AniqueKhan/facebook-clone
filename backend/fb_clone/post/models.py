@@ -46,3 +46,17 @@ class Comment(models.Model):
         return self.truncate_content()
 
 
+class SharedPost(models.Model):
+    post = models.ForeignKey(Post,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    content = models.TextField()
+    likes = models.ManyToManyField(User, related_name='shared_post_likes', blank=True)
+    shared_at = models.DateTimeField(auto_now_add=True)
+    edited=models.BooleanField(default=False)
+    edited_at = models.DateTimeField(blank=True,null=True)
+    privacy = models.CharField(max_length=10, choices=[
+        ('public', 'Public'),
+        ('friends', 'Friends'),
+        ('private', 'Private')
+    ], default='friends')
+

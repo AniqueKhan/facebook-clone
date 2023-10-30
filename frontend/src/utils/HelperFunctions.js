@@ -17,4 +17,17 @@ const gatherConfiguration = (authTokens) => {
   };
 };
 
-export { capitalizeFirstWord, gatherConfiguration };
+const userIsFriend = (user, post) => {
+  if (post.privacy === "friends") {
+    // Check if the post.friends array exists and if any object has an 'id' that matches user.user_id.
+    if (Array.isArray(post.friends)) {
+      return post.friends.some((friend) => friend.id === user.user_id);
+    }
+  }
+  if (post.user.id === user.user_id) {
+    return true;
+  }
+  return false;
+};
+
+export { capitalizeFirstWord, gatherConfiguration, userIsFriend };

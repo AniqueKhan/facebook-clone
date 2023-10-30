@@ -23,7 +23,17 @@ class PostSerializer(serializers.ModelSerializer):
         return timesince(obj.created_at)
     class Meta:
         model = Post
-        fields = ['id','user',"content","likes","comments","media_file","humanized_created_at","is_image"]
+        fields = [
+            'id',
+            'user',
+            "content",
+            "likes",
+            "comments",
+            "media_file",
+            "humanized_created_at",
+            "is_image",
+            "privacy"
+        ]
 
     def get_comments(self, obj):
         comments = Comment.objects.filter(post=obj)

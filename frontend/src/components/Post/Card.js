@@ -4,7 +4,7 @@ import { BASE_URL, API_BASE_POSTS_URL } from "../../utils/ApiEndpoints";
 import axios from "axios";
 import AuthContext from "../../context/AuthContext";
 import likeSound from "../../utils/sounds/facebook_like.mp3";
-import { gatherConfiguration } from "../../utils/HelperFunctions";
+import { gatherConfiguration, userIsFriend } from "../../utils/HelperFunctions";
 
 // Card Component
 function Card({ post }) {
@@ -17,6 +17,9 @@ function Card({ post }) {
 
   // Initializing the comment form variable
   let [commentBox, showCommentBox] = useState(false);
+
+  // Set share button visibility
+  let [shareButtonVisibility, setShareButtonVisibility] = useState(false);
 
   // Initializing the show comment  variable
   let [showComments, setShowComments] = useState(false);
@@ -98,6 +101,12 @@ function Card({ post }) {
       setComments(post.comments);
       setCommentsCount(post.comments.length);
     }
+
+    // Set the initial share button visibility
+    console.log("privacy", post.user, user.user_id);
+    if (post.privacy == "public" || userIsFriend(user, post)) {
+      setShareButtonVisibility(true);
+    }
   }, [post.likes, user.user_id]);
 
   // Main return statement
@@ -144,7 +153,9 @@ function Card({ post }) {
           >
             Comment
           </button>
-          <button className="post-button">Share</button>
+          {shareButtonVisibility && (
+            <button className="post-button">Share</button>
+          )}
         </div>
         {commentBox && (
           <div className="post-comment-form">
