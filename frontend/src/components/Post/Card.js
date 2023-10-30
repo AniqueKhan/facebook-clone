@@ -106,6 +106,7 @@ function Card({ post }) {
     // Set the initial share button visibility
     console.log("privacy", post.privacy);
     if (post.privacy !== "private") {
+      console.log("getting in here");
       if (post.privacy == "public" || userIsFriend(user, post)) {
         setShareButtonVisibility(true);
       }

@@ -18,15 +18,18 @@ const gatherConfiguration = (authTokens) => {
 };
 
 const userIsFriend = (user, post) => {
+  if (post.user.id === user.user_id) {
+    return true;
+  }
   if (post.privacy === "friends") {
     // Check if the post.friends array exists and if any object has an 'id' that matches user.user_id.
     if (Array.isArray(post.user.friends)) {
       return post.user.friends.some((friend) => friend === user.user_id);
     }
   }
-  if (post.user.id === user.user_id) {
-    return true;
-  }
+  console.log("123", post.user.id);
+  console.log("1234", user.user_id);
+
   return false;
 };
 
