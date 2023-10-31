@@ -1,36 +1,163 @@
 import React, { useContext, useEffect, useState } from "react";
 import NavigationBar from "../components/Post/NavigationBar";
 import AuthContext from "../context/AuthContext";
-import { PROFILE_URL } from "../utils/ApiEndpoints";
+import { PROFILE_URL, BASE_URL } from "../utils/ApiEndpoints";
 import axios from "axios";
+import ".././style/Profile.css";
+import { gatherConfiguration } from "../utils/HelperFunctions";
 
 function Profile() {
   let [profileInfo, setProfileInfo] = useState({});
-  const { authTokens, logoutUser } = useContext(AuthContext);
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${authTokens.access}`,
-    },
-  };
+  let [showFullNameInput, setShowFullNameInput] = useState(false);
+  let [showBioInput, setShowBioInput] = useState(false);
+  let [showLocationInput, setShowLocationInput] = useState(false);
+  let [showEmailInput, setShowEmailInput] = useState(false);
+  let [showGenderDropdown, setShowGenderDropdown] = useState(false);
+  let [editedFullName, setEditedFullName] = useState(""); // State for the edited full name
+  let [editedBio, setEditedBio] = useState(""); // State for the edited bio
+  let [editedLocation, setEditedLocation] = useState("");
+  let [editedEmail, setEditedEmail] = useState("");
+  let [editedGender, setEditedGender] = useState("");
+  const { authTokens, logoutUser, user } = useContext(AuthContext);
 
   let getProfileInfo = async () => {
     try {
-      const response = await axios.get(PROFILE_URL, config);
+      const response = await axios.get(
+        PROFILE_URL,
+        gatherConfiguration(authTokens)
+      );
 
       if (response.status === 200) {
         // Successful login
         console.log("Profile Info Gathering Successful");
         console.log(response.data);
-        setProfileInfo(response.data);
+        setProfileInfo(response.data["data"]);
       } else {
-        alert("Something went wrong.");
         console.error("Profile Info Gathering Failed");
         logoutUser();
       }
     } catch (error) {
       // Handle any errors that occurred during the request
-      alert("Something went wrong.");
+      console.error("An error occurred:", error);
+      logoutUser();
+    }
+  };
+
+  let updateFullName = async (newFullName) => {
+    try {
+      const response = await axios.patch(
+        `${PROFILE_URL}/${user.user_id}`,
+        { full_name: newFullName }, // Send the updated full name in the request body
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        console.log("Full Name Update Successful");
+        console.log(response.data);
+        setProfileInfo(response.data["data"]);
+        setShowFullNameInput(false); // Hide the input field after successful update
+      } else {
+        alert("Something went wrong.");
+        console.error("Full Name Update Failed");
+        logoutUser();
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      logoutUser();
+    }
+  };
+
+  let updateBio = async (newBio) => {
+    try {
+      const response = await axios.patch(
+        `${PROFILE_URL}/${user.user_id}`,
+        { bio: newBio }, // Send the updated bio in the request body
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        console.log("Bio Update Successful");
+        console.log(response.data);
+        setProfileInfo(response.data["data"]);
+        setShowBioInput(false); // Hide the input field after successful update
+      } else {
+        alert("Something went wrong.");
+        console.error("Bio Update Failed");
+        logoutUser();
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      logoutUser();
+    }
+  };
+
+  let updateLocation = async (newLocation) => {
+    try {
+      const response = await axios.patch(
+        `${PROFILE_URL}/${user.user_id}`,
+        { location: newLocation }, // Send the updated Location in the request body
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        console.log("Full Name Update Successful");
+        console.log(response.data);
+        setProfileInfo(response.data["data"]);
+        setShowLocationInput(false); // Hide the input field after successful update
+      } else {
+        alert("Something went wrong.");
+        console.error("Full Name Update Failed");
+        logoutUser();
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      logoutUser();
+    }
+  };
+
+  let updateEmail = async (newEmail) => {
+    try {
+      const response = await axios.patch(
+        `${PROFILE_URL}/${user.user_id}`,
+        { email: newEmail }, // Send the updated Email in the request body
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        console.log("Email Update Successful");
+        console.log(response.data);
+        setProfileInfo(response.data["data"]);
+        setShowEmailInput(false); // Hide the input field after successful update
+      } else {
+        alert("Something went wrong.");
+        console.error("Email Update Failed");
+        logoutUser();
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      logoutUser();
+    }
+  };
+
+  let updateGender = async (newGender) => {
+    try {
+      const response = await axios.patch(
+        `${PROFILE_URL}/${user.user_id}`,
+        { gender: newGender }, // Send the updated gender in the request body
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        console.log("Gender Update Successful");
+        console.log(response.data);
+        setProfileInfo(response.data["data"]);
+        setShowGenderDropdown(false); // Hide the gender dropdown after a successful update
+      } else {
+        alert("Something went wrong.");
+        console.error("Gender Update Failed");
+        logoutUser();
+      }
+    } catch (error) {
       console.error("An error occurred:", error);
       logoutUser();
     }
@@ -42,11 +169,120 @@ function Profile() {
   return (
     <div>
       <NavigationBar />
-      <ul>
-        <li>{profileInfo.email}</li>
-        <li>{profileInfo.bio}</li>
-        <li>{profileInfo.full_name}</li>
-      </ul>
+      <div className="profile">
+        {profileInfo.profile_picture ? (
+          <img
+            src={BASE_URL + profileInfo.profile_picture}
+            alt="User Profile Picture"
+          />
+        ) : (
+          <img
+            src={`${BASE_URL}/media/default/default_user_profile.png`}
+            alt="User Profile Picture"
+          />
+        )}
+        <h1>{profileInfo.full_name}</h1>
+        {showFullNameInput && (
+          <input
+            type="text"
+            value={editedFullName}
+            onChange={(e) => setEditedFullName(e.target.value)}
+          />
+        )}
+        {showFullNameInput ? (
+          <button
+            onClick={() => updateFullName(editedFullName)}
+            disabled={editedFullName.trim() === ""}
+          >
+            Save
+          </button> // Call the updateFullName function
+        ) : (
+          <button onClick={() => setShowFullNameInput(true)}>Edit Name</button>
+        )}
+
+        {profileInfo.bio && <p>Bio: {profileInfo.bio}</p>}
+        {showBioInput && (
+          <input
+            type="text"
+            value={editedBio}
+            onChange={(e) => setEditedBio(e.target.value)}
+          />
+        )}
+        {showBioInput ? (
+          <button
+            onClick={() => updateBio(editedBio)}
+            disabled={editedBio.trim() === ""}
+          >
+            Save
+          </button> // Call the updateBio function
+        ) : (
+          <button onClick={() => setShowBioInput(true)}>Edit Bio</button>
+        )}
+        {profileInfo.location && <p>Location: {profileInfo.location}</p>}
+        {showLocationInput && (
+          <input
+            type="text"
+            value={editedLocation}
+            onChange={(e) => setEditedLocation(e.target.value)}
+          />
+        )}
+        {showLocationInput ? (
+          <button
+            onClick={() => updateLocation(editedLocation)}
+            disabled={editedLocation.trim() === ""}
+          >
+            Save
+          </button> // Call the updateLocation function
+        ) : (
+          <button onClick={() => setShowLocationInput(true)}>
+            Edit Location
+          </button>
+        )}
+        {profileInfo.gender && <p>Gender: {profileInfo.gender}</p>}
+        {showGenderDropdown ? (
+          <div>
+            <select
+              value={editedGender}
+              onChange={(e) => setEditedGender(e.target.value)}
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <button
+              onClick={() => {
+                updateGender(editedGender);
+                setShowGenderDropdown(false);
+              }}
+              disabled={editedGender.trim() === ""}
+            >
+              Save
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => setShowGenderDropdown(true)}>
+            Edit Gender
+          </button>
+        )}
+        {profileInfo.email && <p>Email: {profileInfo.email}</p>}
+        {showEmailInput && (
+          <input
+            type="text"
+            value={editedEmail}
+            onChange={(e) => setEditedEmail(e.target.value)}
+          />
+        )}
+        {showEmailInput ? (
+          <button
+            onClick={() => updateEmail(editedEmail)}
+            disabled={editedEmail.trim() === ""}
+          >
+            Save
+          </button> // Call the updateEmail function
+        ) : (
+          <button onClick={() => setShowEmailInput(true)}>Edit Email</button>
+        )}
+      </div>
     </div>
   );
 }

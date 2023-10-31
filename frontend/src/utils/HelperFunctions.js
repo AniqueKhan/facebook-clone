@@ -1,11 +1,12 @@
 function capitalizeFirstWord(input) {
   if (input) {
-    const words = input.split(" ");
+    const words = input.trim().split(" "); // Trim input to remove leading/trailing spaces
     if (words.length > 0) {
       // Capitalize the first word and discard the rest
       return words[0].charAt(0).toUpperCase() + words[0].slice(1);
     }
   }
+  return ""; // Handle empty input or input with only spaces
 }
 
 const gatherConfiguration = (authTokens) => {
@@ -23,14 +24,26 @@ const userIsFriend = (user, post) => {
   }
   if (post.privacy === "friends") {
     // Check if the post.friends array exists and if any object has an 'id' that matches user.user_id.
-    if (Array.isArray(post.user.friends)) {
+    if (post.user && Array.isArray(post.user.friends)) {
       return post.user.friends.some((friend) => friend === user.user_id);
     }
   }
-  console.log("123", post.user.id);
-  console.log("1234", user.user_id);
-
   return false;
 };
 
-export { capitalizeFirstWord, gatherConfiguration, userIsFriend };
+const canEditDelete = (user, post) => {
+  if (post.shared && post.shared_by) {
+    console.log("caneditdelete", post.shared_by.id === user.user_id);
+
+    return post.shared_by.id === user.user_id;
+  } else {
+    return post.user.id === user.user_id;
+  }
+};
+
+export {
+  canEditDelete,
+  capitalizeFirstWord,
+  gatherConfiguration,
+  userIsFriend,
+};

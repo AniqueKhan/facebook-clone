@@ -11,7 +11,7 @@ def validate_image_or_video(value):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="post_user")
     content = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
     comments = models.ForeignKey("Comment",related_name="post_comment",blank=True,null=True,on_delete=models.CASCADE)
     media_file = models.FileField(upload_to='post_media/', blank=True, null=True,validators=[validate_image_or_video])
@@ -30,15 +30,13 @@ class Post(models.Model):
     shared_edited = models.BooleanField(default=False)
     shared_edited_at = models.DateTimeField(blank=True,null=True)
     shared_content = models.TextField(blank=True,null=True)
-
-    shared_at = models.DateTimeField(auto_now_add=True)
-    shared_likes = models.ManyToManyField(User, related_name='shared_post_likes', blank=True)
-    shared_comments = models.ForeignKey("Comment",related_name="shared_post_comment",null=True,on_delete=models.CASCADE, blank=True)
     shared_privacy = models.CharField(max_length=10, choices=[
         ('public', 'Public'),
         ('friends', 'Friends'),
         ('private', 'Private')
     ], default='friends')
+    original_post_id = models.PositiveIntegerField(blank=True,null=True)
+
 
     def truncate_content(self):
         return self.content if len(self.content) < 40 else self.content[:40]

@@ -30,7 +30,7 @@ class LoginSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):    
     class Meta:
         model = User
-        fields = ['id','email','full_name','bio','profile_picture',"friends"]
+        fields = ['id','email','full_name','bio','profile_picture',"friends","gender","location"]
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):

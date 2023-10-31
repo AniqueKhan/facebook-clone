@@ -45,13 +45,6 @@ class LoginView(APIView):
                 return Response({"token":token,"message":"Login Successful"},status.HTTP_200_OK)
             return Response({"error":{"non_field_errors":['Invalid Credentials']}},status.HTTP_400_BAD_REQUEST)
 
-
-class ProfileView(APIView):
-    permission_classes=[IsAuthenticated]
-    def get(self,request,format=None):
-        serializer = ProfileSerializer(request.user)
-        return Response(serializer.data,status.HTTP_200_OK)
-        
 class FriendRequestView(ModelViewSet):
     queryset = FriendRequest.objects.all()
     http_method_names = ['get','post','patch']
@@ -135,4 +128,35 @@ class FriendRequestView(ModelViewSet):
         current_user.save()
         friend_request.save()
         serializer = FriendRequestSerializer(friend_request,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+    
+
+class ProfileView(ModelViewSet):
+    permission_classes=[IsAuthenticated]
+    serializer_class = ProfileSerializer
+    http_method_names = ['get','patch']
+
+    def list(self,request):
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data,status.HTTP_200_OK)
+    
+    def partial_update(self, request,pk=None):
+        current_user=request.user
+        full_name = request.data.get("full_name")
+        bio = request.data.get("bio")
+        location = request.data.get("location")
+        gender = request.data.get("gender")
+        email = request.data.get("email")
+
+        if not full_name and not bio and not location and not gender and not email:
+            return Response({"error_message":"You need to provide atleast one information to update your profile"})
+        
+        if full_name:current_user.full_name=full_name
+        if bio:current_user.bio=bio
+        if location:current_user.location=location
+        if gender:current_user.gender=gender
+        if email:current_user.email=email
+
+        current_user.save()
+        serializer = self.serializer_class(current_user)
         return Response(serializer.data,status.HTTP_200_OK)

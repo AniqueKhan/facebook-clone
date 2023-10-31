@@ -25,7 +25,7 @@ class PostSerializer(serializers.ModelSerializer):
         return timesince(obj.created_at)
     
     def get_humanized_shared_at(self,obj):
-        return timesince(obj.shared_at)
+        return timesince(obj.shared_at) if obj.shared_at else None
     class Meta:
         model = Post
         fields = [
@@ -41,6 +41,7 @@ class PostSerializer(serializers.ModelSerializer):
             "humanized_shared_at",
             "shared",
             "shared_by",
+            "original_post_id"
         ]
 
     def get_comments(self, obj):

@@ -18,7 +18,7 @@ class PostView(ModelViewSet):
         # Feed posts
         current_user = request.user
         feed_users = User.objects.filter(pk=current_user.pk) | current_user.friends.all()
-        posts = self.queryset.filter(user__in=feed_users).order_by("-created_at",'-shared_at')
+        posts = self.queryset.filter(user__in=feed_users).order_by('-shared_at',"-created_at")
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
     
@@ -107,17 +107,20 @@ class PostView(ModelViewSet):
         if post.privacy == "private":
             return Response({"error_message":"This post is private so you can not share it."})
         
-        if post.privacy == "friends" and current_user not in post.user.friends.all():
+        if post.privacy == "friends" and current_user not in post.user.friends.all() and not current_user==post.user:
             return Response({"error_message":"You are not friends with the post user so you can share this post."})
         
         shared_post = Post.objects.create(
             user=post.user,
-            content=post.content
+            content=post.content,
+            created_at=post.created_at,
+            original_post_id=post.id
         )
 
         shared_post.shared = True
         shared_post.shared_at = datetime.now()
         shared_post.shared_by = current_user
+        shared_post.privacy = post.privacy
 
         if post.media_file:shared_post.media_file=post.media_file
 

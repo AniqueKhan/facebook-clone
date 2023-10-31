@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PrivateRoute from "./utils/PrivateRoute";
 import Profile from "./pages/Profile";
+import DetailedPost from "./components/Post/DetailedPost";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
             path="/profile"
             element={<PrivateRoute Component={Profile} />}
           />
-
+          <Route path="/posts/:post_id" element={<DetailedPost />} />
           <Route element={<Login />} path="/login" />
         </Routes>
       </AuthProvider>

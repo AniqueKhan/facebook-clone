@@ -4,11 +4,20 @@ import { BASE_URL, API_BASE_POSTS_URL } from "../../utils/ApiEndpoints";
 import axios from "axios";
 import AuthContext from "../../context/AuthContext";
 import likeSound from "../../utils/sounds/facebook_like.mp3";
-import { gatherConfiguration, userIsFriend } from "../../utils/HelperFunctions";
+import {
+  gatherConfiguration,
+  userIsFriend,
+  canEditDelete,
+} from "../../utils/HelperFunctions";
+import { Link } from "react-router-dom";
 
 // Card Component
 function Card({ post }) {
   const { authTokens, user } = useContext(AuthContext);
+
+  // Check for permissions
+  let canEditDeletePermission = canEditDelete(user, post);
+
   // Initializing liked state variable
   let [liked, setLiked] = useState(false);
 
@@ -32,6 +41,15 @@ function Card({ post }) {
 
   // Initializing comments count state variable
   let [commentsCount, setCommentsCount] = useState(0);
+
+  // State variable to manage the dropdown visibility
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+  // Function to toggle dropdown visibility
+  const toggleDropdown = () => {
+    console.log("dropdown btn clicked");
+    setDropdownVisible(!isDropdownVisible);
+  };
 
   // Toggle Like Function
   const toggleLike = async () => {
@@ -111,14 +129,42 @@ function Card({ post }) {
         setShareButtonVisibility(true);
       }
     }
-  }, [post.likes, user.user_id]);
+  }, [post, user]);
 
   // Main return statement
+  console.log(canEditDeletePermission);
   return (
     <div className="middle-portion">
       <div className="post-card">
+        {/* Dropdown Button */}
+        <div className="dropdown">
+          <button onClick={toggleDropdown} className="dropbtn">
+            &#8942; {/* Unicode for vertical ellipsis (three dots) */}
+          </button>
+
+          {/* Dropdown Content */}
+          {isDropdownVisible && (
+            <div className="dropdown-content">
+              <button href="#" className="dropdown-option">
+                Save
+              </button>
+              {canEditDeletePermission && (
+                <button href="#" className="dropdown-option">
+                  Edit
+                </button>
+              )}
+              {canEditDeletePermission && (
+                <button href="#" className="dropdown-option">
+                  Delete
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Shared Post Header */}
-        {post.shared && (
+
+        {post.shared && post.shared_by && post.shared_by.profile_picture && (
           <div className="user-info" style={{ marginBottom: "24px" }}>
             {post.shared_by.profile_picture ? (
               <img
@@ -136,14 +182,23 @@ function Card({ post }) {
               <p className="username">
                 {post.shared_by.full_name} shared {post.user.full_name}'s post
               </p>
-              <p className="post-date">{post.humanized_created_at} ago</p>
+              <p className="post-date">
+                {post.humanized_shared_at == "0 minutes"
+                  ? "Just Now"
+                  : `${post.humanized_shared_at} ago`}
+              </p>
+              <Link to={`/posts/${post.id}`}>
+                <small style={{ color: "white", textDecoration: "none" }}>
+                  View Details
+                </small>
+              </Link>
             </div>
           </div>
         )}
 
         <div className="post-header">
           <div className="user-info">
-            {post.user.profile_picture ? (
+            {post && post.user && post.user.profile_picture ? (
               <img
                 src={BASE_URL + post.user.profile_picture}
                 alt="User Profile Picture"
@@ -156,8 +211,20 @@ function Card({ post }) {
             )}
 
             <div className="user-details">
-              <p className="username">{post.user.full_name}</p>
-              <p className="post-date">{post.humanized_created_at} ago</p>
+              {post && post.user && post.user.full_name && (
+                <p className="username">{post.user.full_name}</p>
+              )}
+
+              <p className="post-date">
+                {post.humanized_created_at == "0 minutes"
+                  ? "Just Now"
+                  : `${post.humanized_created_at} ago`}
+              </p>
+              <Link to={`/posts/${post.original_post_id}`}>
+                <small style={{ color: "white", textDecoration: "none" }}>
+                  View Details
+                </small>
+              </Link>
             </div>
           </div>
         </div>
