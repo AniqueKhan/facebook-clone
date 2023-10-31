@@ -10,7 +10,7 @@ def validate_image_or_video(value):
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="post_user")
-    content = models.TextField()
+    content = models.TextField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
     comments = models.ForeignKey("Comment",related_name="post_comment",blank=True,null=True,on_delete=models.CASCADE)
@@ -47,11 +47,14 @@ class Post(models.Model):
         return self.truncate_content()
     
     def is_image(self):
+        if not self.media_file:return False
         return self.media_file.name.split('.')[-1] in ['jpg','jpeg','png']
     
     def save(self,*args,**kwargs):
         if self.privacy=="private" and self.shared:
             raise ValidationError("Private post can not be shared.")
+        if not self.content and not self.media_file:
+            raise ValidationError("You either need to provide content or media file") 
         super(Post,self).save(*args,**kwargs)
 
 class Comment(models.Model):

@@ -18,7 +18,7 @@ class PostView(ModelViewSet):
         # Feed posts
         current_user = request.user
         feed_users = User.objects.filter(pk=current_user.pk) | current_user.friends.all()
-        posts = Post.objects.filter(user__in=feed_users)
+        posts = self.queryset.filter(user__in=feed_users).order_by("-created_at",'-shared_at')
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
     
@@ -94,7 +94,40 @@ class PostView(ModelViewSet):
         posts = self.queryset.filter(user=user)
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
+    
+    @action(detail=True,methods=['post'])
+    def share_post(self,request,pk):
+        current_user = request.user
+        post = self.queryset.filter(pk=pk).first()
+        content = request.data.get("content")
 
+        if not post:
+            return Response({"error_message":"No post exist with this ID."},status.HTTP_400_BAD_REQUEST)
+        
+        if post.privacy == "private":
+            return Response({"error_message":"This post is private so you can not share it."})
+        
+        if post.privacy == "friends" and current_user not in post.user.friends.all():
+            return Response({"error_message":"You are not friends with the post user so you can share this post."})
+        
+        shared_post = Post.objects.create(
+            user=post.user,
+            content=post.content
+        )
+
+        shared_post.shared = True
+        shared_post.shared_at = datetime.now()
+        shared_post.shared_by = current_user
+
+        if post.media_file:shared_post.media_file=post.media_file
+
+        if content:shared_post.shared_content=content
+
+        shared_post.save()
+
+        serializer = self.serializer_class(shared_post,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+    
     @action(detail=True,methods=['get'])
     def like_post(self,request,pk):
         current_user = request.user

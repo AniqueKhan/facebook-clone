@@ -117,12 +117,44 @@ function Card({ post }) {
   return (
     <div className="middle-portion">
       <div className="post-card">
+        {/* Shared Post Header */}
+        {post.shared && (
+          <div className="user-info" style={{ marginBottom: "24px" }}>
+            {post.shared_by.profile_picture ? (
+              <img
+                src={BASE_URL + post.shared_by.profile_picture}
+                alt="User Profile Picture"
+              />
+            ) : (
+              <img
+                src={`${BASE_URL}/media/default/default_user_profile.png`}
+                alt="User Profile Picture"
+              />
+            )}
+
+            <div className="user-details">
+              <p className="username">
+                {post.shared_by.full_name} shared {post.user.full_name}'s post
+              </p>
+              <p className="post-date">{post.humanized_created_at} ago</p>
+            </div>
+          </div>
+        )}
+
         <div className="post-header">
           <div className="user-info">
-            <img
-              src={BASE_URL + post.user.profile_picture}
-              alt="User Profile Picture"
-            />
+            {post.user.profile_picture ? (
+              <img
+                src={BASE_URL + post.user.profile_picture}
+                alt="User Profile Picture"
+              />
+            ) : (
+              <img
+                src={`${BASE_URL}/media/default/default_user_profile.png`}
+                alt="User Profile Picture"
+              />
+            )}
+
             <div className="user-details">
               <p className="username">{post.user.full_name}</p>
               <p className="post-date">{post.humanized_created_at} ago</p>
@@ -139,9 +171,11 @@ function Card({ post }) {
             <video controls src={BASE_URL + post.media_file} alt="Post Image" />
           </div>
         )}
-        <div className="post-footer">
-          <p className="caption">{post.content}</p>
-        </div>
+        {post.content && (
+          <div className="post-footer">
+            <p className="caption">{post.content}</p>
+          </div>
+        )}
         <div className="button-container">
           {likesCount > 0 && <p>Likes Count : {likesCount}</p>}
           <audio src={likeSound} id="likeSound" />
@@ -185,7 +219,6 @@ function Card({ post }) {
             Show Comments
           </button>
         )}
-
         {showComments &&
           comments.length > 0 &&
           comments.map((comment) => (
