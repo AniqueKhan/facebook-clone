@@ -3,7 +3,11 @@ import { createContext, useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { LOGIN_URL, TOKEN_REFRESH_URL } from "../utils/ApiEndpoints";
+import {
+  LOGIN_URL,
+  TOKEN_REFRESH_URL,
+  REGISTER_URL,
+} from "../utils/ApiEndpoints";
 
 // Creating and Exporting the Auth Context
 const AuthContext = createContext();
@@ -55,6 +59,46 @@ export const AuthProvider = ({ children }) => {
         navigate("/");
       } else {
         console.error("Login failed");
+      }
+    } catch (error) {
+      // Handle any errors that occurred during the request
+      console.error("An error occurred:", error);
+    }
+  };
+
+  // Register Function
+  // Registration Function
+  const registerUser = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        REGISTER_URL, // Replace with your actual registration API endpoint
+        {
+          email: e.target.email.value,
+          full_name: e.target.full_name.value, // Add full_name field
+          password: e.target.password.value,
+          password2: e.target.password2.value, // Add password2 field
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        // Assuming 201 is the successful registration status code
+        const token = response.data["data"]["token"];
+        // Successful registration
+        console.log("Registration Successful");
+        console.log(token);
+        console.log(response.data);
+        setAuthTokens(token);
+        setUser(jwt_decode(token["access"]));
+        localStorage.setItem("authTokens", JSON.stringify(token));
+        navigate("/"); // Redirect the user to the desired page after registration
+      } else {
+        console.error("Registration failed");
       }
     } catch (error) {
       // Handle any errors that occurred during the request
@@ -123,6 +167,7 @@ export const AuthProvider = ({ children }) => {
     authTokens: authTokens,
     loginUser: loginUser,
     logoutUser: logoutUser,
+    registerUser: registerUser,
   };
   return (
     <AuthContext.Provider value={contextData}>

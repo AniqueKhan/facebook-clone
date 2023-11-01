@@ -7,6 +7,7 @@ from user_management.models import User
 from post.models import Post,Comment
 from rest_framework.decorators import action
 from datetime import datetime
+from django.db.models import Q
 
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
@@ -17,8 +18,9 @@ class PostView(ModelViewSet):
     def list(self,request):
         # Feed posts
         current_user = request.user
-        feed_users = User.objects.filter(pk=current_user.pk) | current_user.friends.all()
-        posts = self.queryset.filter(user__in=feed_users).order_by('-shared_at',"-created_at")
+        current_user_friends=current_user.friends.all()
+        feed_users = User.objects.filter(pk=current_user.pk) | current_user_friends
+        posts = self.queryset.filter(Q(user__in=feed_users)|Q(shared_by__in=current_user_friends)).order_by('-shared_at',"-created_at")
         serializer = self.serializer_class(posts,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
     

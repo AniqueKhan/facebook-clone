@@ -10,3 +10,7 @@ export const TOKEN_VERIFICATION_URL = `${API_BASE_USER_URL}/token/verifiy`;
 
 // For Posts
 export const API_BASE_POSTS_URL = "http://localhost:8000/api/posts";
+
+// For Friend Requests
+export const API_BASE_FRIEND_REQUESTS_URL =
+  "http://localhost:8000/api/user/friend_requests";

@@ -39,6 +39,9 @@ function NewsFeed() {
   useEffect(() => {
     getPosts();
   }, []);
+  if (posts.length === 0) {
+    return <h1>No posts to show</h1>;
+  }
   return (
     <div>
       {posts.map((post) => (

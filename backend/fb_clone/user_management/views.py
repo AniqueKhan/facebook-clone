@@ -51,8 +51,9 @@ class FriendRequestView(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self,request):
-        return Response({"error_message": "Get all method disabled"},
-                        status=status.HTTP_400_BAD_REQUEST)
+        queryset = self.queryset.filter(to_user=request.user,status="P")
+        serializer = FriendRequestSerializer(queryset,many=True)
+        return Response(serializer.data,status.HTTP_200_OK)
     
     def retrieve(self,request,pk=None):
         return Response({"error_message": "Get single method disabled"},
@@ -61,12 +62,6 @@ class FriendRequestView(ModelViewSet):
     @action(detail=False,methods=['GET'])
     def sent_requests(self,request):
         queryset = self.queryset.filter(from_user=request.user)
-        serializer = FriendRequestSerializer(queryset,many=True)
-        return Response(serializer.data,status.HTTP_200_OK)
-
-    @action(detail=False,methods=['GET'])
-    def received_requests(self,request):
-        queryset = self.queryset.filter(to_user=request.user,status="P")
         serializer = FriendRequestSerializer(queryset,many=True)
         return Response(serializer.data,status.HTTP_200_OK)
     
@@ -137,8 +132,19 @@ class ProfileView(ModelViewSet):
     http_method_names = ['get','patch']
 
     def list(self,request):
-        serializer = self.serializer_class(request.user)
+        return Response({"error_message":"List method disabled"})
+    
+    def retrieve(self, request, pk):
+        current_user = request.user
+        user = User.objects.filter(pk=pk).first()
+        if not user:
+            return Response({"error_message":"No user exist with this id"})
+        if user==current_user:
+            serializer = self.serializer_class(request.user)
+            return Response(serializer.data,status.HTTP_200_OK)
+        serializer = self.serializer_class(user)
         return Response(serializer.data,status.HTTP_200_OK)
+        
     
     def partial_update(self, request,pk=None):
         current_user=request.user

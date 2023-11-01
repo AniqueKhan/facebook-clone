@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useId, useState } from "react";
 import NavigationBar from "../components/Post/NavigationBar";
 import AuthContext from "../context/AuthContext";
 import { PROFILE_URL, BASE_URL } from "../utils/ApiEndpoints";
 import axios from "axios";
 import ".././style/Profile.css";
 import { gatherConfiguration } from "../utils/HelperFunctions";
-
+import { useParams } from "react-router-dom";
 function Profile() {
   let [profileInfo, setProfileInfo] = useState({});
   let [showFullNameInput, setShowFullNameInput] = useState(false);
@@ -19,11 +19,17 @@ function Profile() {
   let [editedEmail, setEditedEmail] = useState("");
   let [editedGender, setEditedGender] = useState("");
   const { authTokens, logoutUser, user } = useContext(AuthContext);
+  const { user_id } = useParams();
+  const myProfile = user && user.user_id.toString() === user_id;
+  console.log("component called", myProfile);
+  console.log("component called", user.user_id);
+  console.log("component called", typeof user.user_id);
+  console.log("component called", typeof user_id);
 
   let getProfileInfo = async () => {
     try {
       const response = await axios.get(
-        PROFILE_URL,
+        `${PROFILE_URL}/${user_id}`,
         gatherConfiguration(authTokens)
       );
 
@@ -165,7 +171,7 @@ function Profile() {
 
   useEffect(() => {
     getProfileInfo();
-  }, []);
+  }, [user_id]);
   return (
     <div>
       <NavigationBar />
@@ -182,106 +188,119 @@ function Profile() {
           />
         )}
         <h1>{profileInfo.full_name}</h1>
-        {showFullNameInput && (
+        {showFullNameInput && myProfile && (
           <input
             type="text"
             value={editedFullName}
             onChange={(e) => setEditedFullName(e.target.value)}
           />
         )}
-        {showFullNameInput ? (
-          <button
-            onClick={() => updateFullName(editedFullName)}
-            disabled={editedFullName.trim() === ""}
-          >
-            Save
-          </button> // Call the updateFullName function
-        ) : (
-          <button onClick={() => setShowFullNameInput(true)}>Edit Name</button>
-        )}
+        {myProfile &&
+          profileInfo.full_name &&
+          (showFullNameInput ? (
+            <button
+              onClick={() => updateFullName(editedFullName)}
+              disabled={editedFullName.trim() === ""}
+            >
+              Save
+            </button> // Call the updateFullName function
+          ) : (
+            <button onClick={() => setShowFullNameInput(true)}>
+              Edit Name
+            </button>
+          ))}
 
         {profileInfo.bio && <p>Bio: {profileInfo.bio}</p>}
-        {showBioInput && (
+        {showBioInput && myProfile && (
           <input
             type="text"
             value={editedBio}
             onChange={(e) => setEditedBio(e.target.value)}
           />
         )}
-        {showBioInput ? (
-          <button
-            onClick={() => updateBio(editedBio)}
-            disabled={editedBio.trim() === ""}
-          >
-            Save
-          </button> // Call the updateBio function
-        ) : (
-          <button onClick={() => setShowBioInput(true)}>Edit Bio</button>
-        )}
+        {myProfile &&
+          profileInfo.bio &&
+          (showBioInput ? (
+            <button
+              onClick={() => updateBio(editedBio)}
+              disabled={editedBio.trim() === ""}
+            >
+              Save
+            </button> // Call the updateBio function
+          ) : (
+            <button onClick={() => setShowBioInput(true)}>Edit Bio</button>
+          ))}
+
         {profileInfo.location && <p>Location: {profileInfo.location}</p>}
-        {showLocationInput && (
+        {showLocationInput && myProfile && (
           <input
             type="text"
             value={editedLocation}
             onChange={(e) => setEditedLocation(e.target.value)}
           />
         )}
-        {showLocationInput ? (
-          <button
-            onClick={() => updateLocation(editedLocation)}
-            disabled={editedLocation.trim() === ""}
-          >
-            Save
-          </button> // Call the updateLocation function
-        ) : (
-          <button onClick={() => setShowLocationInput(true)}>
-            Edit Location
-          </button>
-        )}
-        {profileInfo.gender && <p>Gender: {profileInfo.gender}</p>}
-        {showGenderDropdown ? (
-          <div>
-            <select
-              value={editedGender}
-              onChange={(e) => setEditedGender(e.target.value)}
-            >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
+        {myProfile &&
+          profileInfo.location &&
+          (showLocationInput ? (
             <button
-              onClick={() => {
-                updateGender(editedGender);
-                setShowGenderDropdown(false);
-              }}
-              disabled={editedGender.trim() === ""}
+              onClick={() => updateLocation(editedLocation)}
+              disabled={editedLocation.trim() === ""}
             >
               Save
+            </button> // Call the updateLocation function
+          ) : (
+            <button onClick={() => setShowLocationInput(true)}>
+              Edit Location
             </button>
-          </div>
-        ) : (
-          <button onClick={() => setShowGenderDropdown(true)}>
-            Edit Gender
-          </button>
-        )}
+          ))}
+        {profileInfo.gender && <p>Gender: {profileInfo.gender}</p>}
+        {myProfile &&
+          profileInfo.gender &&
+          (showGenderDropdown ? (
+            <div>
+              <select
+                value={editedGender}
+                onChange={(e) => setEditedGender(e.target.value)}
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <button
+                onClick={() => {
+                  updateGender(editedGender);
+                  setShowGenderDropdown(false);
+                }}
+                disabled={editedGender.trim() === ""}
+              >
+                Save
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setShowGenderDropdown(true)}>
+              Edit Gender
+            </button>
+          ))}
         {profileInfo.email && <p>Email: {profileInfo.email}</p>}
-        {showEmailInput && (
+        {myProfile && showEmailInput && (
           <input
             type="text"
             value={editedEmail}
             onChange={(e) => setEditedEmail(e.target.value)}
           />
         )}
-        {showEmailInput ? (
-          <button
-            onClick={() => updateEmail(editedEmail)}
-            disabled={editedEmail.trim() === ""}
-          >
-            Save
-          </button> // Call the updateEmail function
-        ) : (
-          <button onClick={() => setShowEmailInput(true)}>Edit Email</button>
-        )}
+        {myProfile &&
+          profileInfo.email &&
+          (showEmailInput ? (
+            <button
+              onClick={() => updateEmail(editedEmail)}
+              disabled={editedEmail.trim() === ""}
+            >
+              Save
+            </button> // Call the updateEmail function
+          ) : (
+            <button onClick={() => setShowEmailInput(true)}>Edit Email</button>
+          ))}
       </div>
     </div>
   );

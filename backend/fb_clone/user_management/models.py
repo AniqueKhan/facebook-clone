@@ -2,6 +2,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class UserManager(BaseUserManager):
     def create_user(self, email,full_name,password=None,password2=None):
@@ -70,3 +71,8 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
+    
+    def save(self,*args,**kwargs):
+        if self.to_user in self.from_user.friends.all():
+            raise ValidationError("Already friends")
+        super(FriendRequest,self).save(*args,**kwargs)

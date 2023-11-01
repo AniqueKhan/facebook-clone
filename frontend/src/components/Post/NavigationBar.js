@@ -11,17 +11,22 @@ function NavigationBar() {
         Anique's Facebook Clone
       </Link>
       <Link to="/">My Feed</Link>
-      <Link to="/">Inbox</Link>
+      <Link to="/friend_requests">Friend Requests</Link>
       <Link to="/">Notification</Link>
       <Link to="/">Settings</Link>
 
-      {user && (
-        <Link to="/profile">Hi , {capitalizeFirstWord(user.full_name)}</Link>
+      {user && user.user_id && (
+        <Link to={`/profile/${user.user_id}`}>
+          Hi , {capitalizeFirstWord(user.full_name)}
+        </Link>
       )}
       {user ? (
         <p onClick={logoutUser}>Logout</p>
       ) : (
-        <Link to="/login">Login</Link>
+        <>
+          <Link to="/login">Login</Link>
+          <Link to="/register">Register</Link>
+        </>
       )}
     </div>
   );

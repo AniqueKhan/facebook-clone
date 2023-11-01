@@ -176,8 +176,16 @@ function Card({ post }) {
 
             <div className="user-details">
               <p className="username">
-                {post.shared_by.full_name} shared {post.user.full_name}'s post
+                <Link to={`/profile/${post.shared_by.id}`}>
+                  {post.shared_by.full_name}
+                </Link>
+                shared
+                <Link to={`/profile/${post.user.id}`}>
+                  {post.user.full_name}
+                </Link>
+                's post
               </p>
+
               <p className="post-date">
                 {post.humanized_shared_at == "0 minutes"
                   ? "Just Now"
@@ -208,7 +216,11 @@ function Card({ post }) {
 
             <div className="user-details">
               {post && post.user && post.user.full_name && (
-                <p className="username">{post.user.full_name}</p>
+                <p className="username">
+                  <Link to={`/profile/${post.user.id}`}>
+                    {post.user.full_name}
+                  </Link>
+                </p>
               )}
 
               <p className="post-date">

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from user_management.models import User,FriendRequest
+from django.utils.timesince import timesince
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,6 +37,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 class FriendRequestSerializer(serializers.ModelSerializer):
     from_user = ProfileSerializer(many=False)
     to_user = ProfileSerializer(many=False)
+    humanized_created_at = serializers.SerializerMethodField()
+
+    def get_humanized_created_at(self,obj):
+        return timesince(obj.created_at)
     class Meta:
         model = FriendRequest
-        fields = ["id","from_user","to_user","status"]
+        fields = ["id","from_user","to_user","status","humanized_created_at"]
