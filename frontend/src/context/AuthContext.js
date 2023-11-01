@@ -13,7 +13,6 @@ export default AuthContext;
 export const AuthProvider = ({ children }) => {
   // Initializing variables
   let initialLocalStorageTokens = localStorage.getItem("authTokens");
-  console.log(initialLocalStorageTokens);
 
   // State Management
   let [authTokens, setAuthTokens] = useState(() =>
@@ -125,7 +124,6 @@ export const AuthProvider = ({ children }) => {
     loginUser: loginUser,
     logoutUser: logoutUser,
   };
-  console.log(loading);
   return (
     <AuthContext.Provider value={contextData}>
       {loading ? null : children}

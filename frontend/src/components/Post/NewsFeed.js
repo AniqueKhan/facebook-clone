@@ -25,7 +25,6 @@ function NewsFeed() {
         console.log("Post Info Gathering Successful");
         console.log(response.data);
         setPosts(response.data["data"]);
-        console.log("posts", posts);
       } else {
         console.error("Post Info Gathering Failed");
         logoutUser();

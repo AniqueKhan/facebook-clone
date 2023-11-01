@@ -47,7 +47,6 @@ function Card({ post }) {
 
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
-    console.log("dropdown btn clicked");
     setDropdownVisible(!isDropdownVisible);
   };
 
@@ -122,9 +121,7 @@ function Card({ post }) {
     }
 
     // Set the initial share button visibility
-    console.log("privacy", post.privacy);
     if (post.privacy !== "private") {
-      console.log("getting in here");
       if (post.privacy == "public" || userIsFriend(user, post)) {
         setShareButtonVisibility(true);
       }
@@ -132,7 +129,6 @@ function Card({ post }) {
   }, [post, user]);
 
   // Main return statement
-  console.log(canEditDeletePermission);
   return (
     <div className="middle-portion">
       <div className="post-card">
@@ -220,7 +216,9 @@ function Card({ post }) {
                   ? "Just Now"
                   : `${post.humanized_created_at} ago`}
               </p>
-              <Link to={`/posts/${post.original_post_id}`}>
+              <Link
+                to={`/posts/${post.shared ? post.original_post_id : post.id}`}
+              >
                 <small style={{ color: "white", textDecoration: "none" }}>
                   View Details
                 </small>

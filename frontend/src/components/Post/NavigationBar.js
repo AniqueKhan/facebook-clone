@@ -5,7 +5,6 @@ import { capitalizeFirstWord } from "../../utils/HelperFunctions";
 import "../../style/NavigationBar.css";
 function NavigationBar() {
   let { user, logoutUser } = useContext(AuthContext);
-  console.log("user", user);
   return (
     <div className="navbar">
       <Link className="logo" to="/">

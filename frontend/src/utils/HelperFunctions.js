@@ -19,12 +19,19 @@ const gatherConfiguration = (authTokens) => {
 };
 
 const userIsFriend = (user, post) => {
-  if (post.user.id === user.user_id) {
+  if (
+    post &&
+    user &&
+    post.user &&
+    post.user.id &&
+    user.user_id &&
+    post.user.id === user.user_id
+  ) {
     return true;
   }
   if (post.privacy === "friends") {
     // Check if the post.friends array exists and if any object has an 'id' that matches user.user_id.
-    if (post.user && Array.isArray(post.user.friends)) {
+    if (post.user && post.user.friends && Array.isArray(post.user.friends)) {
       return post.user.friends.some((friend) => friend === user.user_id);
     }
   }
@@ -32,12 +39,18 @@ const userIsFriend = (user, post) => {
 };
 
 const canEditDelete = (user, post) => {
-  if (post.shared && post.shared_by) {
-    console.log("caneditdelete", post.shared_by.id === user.user_id);
-
+  if (
+    post.shared &&
+    post.shared_by &&
+    post.shared_by.id &&
+    user &&
+    user.user_id
+  ) {
     return post.shared_by.id === user.user_id;
   } else {
-    return post.user.id === user.user_id;
+    if (post.user && post.user.id && user && user.user_id) {
+      return post.user.id === user.user_id;
+    }
   }
 };
 

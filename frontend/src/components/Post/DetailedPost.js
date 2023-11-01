@@ -22,7 +22,6 @@ function DetailedPost() {
         console.log("Post Retrieval Successful");
         console.log(response.data["data"]);
         setPost(response.data["data"]);
-        console.log("post info", post);
       } else {
         console.error("Post Retrieval Failed");
         logoutUser();
