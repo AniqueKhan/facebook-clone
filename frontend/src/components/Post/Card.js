@@ -45,6 +45,10 @@ function Card({ post }) {
   // State variable to manage the dropdown visibility
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 
+  // Comment state variables to your component
+  const [likedComments, setLikedComments] = useState({});
+  const [commentLikeCounts, setCommentLikeCounts] = useState({});
+
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
@@ -106,6 +110,56 @@ function Card({ post }) {
     }
   };
 
+  const toggleCommentLike = async (commentId) => {
+    const audio = document.getElementById("likeSound");
+
+    try {
+      const response = await axios.get(
+        `${API_BASE_POSTS_URL}/like_comment/${commentId}`,
+        gatherConfiguration(authTokens)
+      );
+
+      if (response.status === 200) {
+        const updatedPost = response.data["data"];
+
+        // Check if the comment is already liked by the user
+        if (user && user.user_id) {
+          const isCommentLiked = updatedPost.comments.some(
+            (comment) =>
+              comment.id === commentId &&
+              comment.likes.some((like) => like.id === user.user_id)
+          );
+
+          // Create a copy of the liked state
+          const updatedLikedComments = { ...likedComments };
+
+          // Update the liked state of the comment based on its ID
+          updatedLikedComments[commentId] = isCommentLiked;
+
+          // Update the like count
+          setCommentLikeCounts({
+            ...commentLikeCounts,
+            [commentId]:
+              updatedPost.comments.find((comment) => comment.id === commentId)
+                ?.likes.length || 0,
+          });
+
+          // Play the like sound if the user liked the comment
+          if (isCommentLiked) {
+            audio.play();
+          }
+
+          // Set the updated liked state
+          setLikedComments(updatedLikedComments);
+        }
+      } else {
+        console.log("Error while liking/unliking the comment");
+      }
+    } catch (error) {
+      console.error("Error while liking/unliking the comment:", error);
+    }
+  };
+
   // Use Effect
   useEffect(() => {
     // Checking if the user has already liked the post
@@ -125,6 +179,25 @@ function Card({ post }) {
       if (post.privacy == "public" || userIsFriend(user, post)) {
         setShareButtonVisibility(true);
       }
+    }
+
+    // Initialize liked comments and their like counts
+    if (post.comments) {
+      const initialLikedComments = {};
+      const initialCommentLikeCounts = {};
+      post.comments.forEach((comment) => {
+        console.log(comment, "cmt object");
+        if (user && user.user_id) {
+          const isLiked = comment.likes.some(
+            (like) => like.id === user.user_id
+          );
+          initialLikedComments[comment.id] = isLiked;
+          initialCommentLikeCounts[comment.id] = comment.likes.length;
+        }
+      });
+
+      setLikedComments(initialLikedComments);
+      setCommentLikeCounts(initialCommentLikeCounts);
     }
   }, [post, user]);
 
@@ -288,11 +361,7 @@ function Card({ post }) {
           </div>
         )}
         {comments.length > 0 && (
-          <button
-            onClick={() => {
-              setShowComments(!showComments);
-            }}
-          >
+          <button onClick={() => setShowComments(!showComments)}>
             Show Comments
           </button>
         )}
@@ -302,6 +371,15 @@ function Card({ post }) {
             <div key={comment.id} className="comment">
               <p>
                 {comment.user.full_name}: {comment.content}
+                <span style={{ color: "blue" }}>
+                  <u
+                    onClick={() => toggleCommentLike(comment.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {likedComments[comment.id] ? "Liked" : "Like"}
+                  </u>
+                </span>
+                <span>Like Count : {commentLikeCounts[comment.id] || 0}</span>
               </p>
             </div>
           ))}

@@ -8,7 +8,7 @@ class CommentSerializer(serializers.ModelSerializer):
     likes = ProfileSerializer(many=True)
     class Meta:
         model = Comment
-        fields=['user','likes','content',"edited"]
+        fields=['id','user','likes','content',"edited"]
 class PostSerializer(serializers.ModelSerializer):
     user = ProfileSerializer()
     likes = ProfileSerializer(many=True)

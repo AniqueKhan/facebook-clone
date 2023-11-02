@@ -77,7 +77,21 @@ class PostView(ModelViewSet):
         serializer = self.serializer_class(post,many=False)
         return Response(serializer.data,status.HTTP_200_OK)
         
-    
+    @action(detail=True,methods=['get'])
+    def like_comment(self,request,pk):
+        current_user = request.user
+        comment = Comment.objects.filter(pk=pk).first()
+        if not comment:
+            return Response({"error_message":"No comment exist with this id"})
+        
+        if current_user not in comment.likes.all():
+            comment.likes.add(current_user)
+        else:
+            comment.likes.remove(current_user)
+
+        serializer = self.serializer_class(comment.post,many=False)
+        return Response(serializer.data,status.HTTP_200_OK)
+
     @action(detail=False,methods=['get'])
     def my_posts(self,request):
         posts =self.queryset.filter(user=request.user)
